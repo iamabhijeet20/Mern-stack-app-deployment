@@ -1,0 +1,24 @@
+---
+- name: Download Helm tarball
+  ansible.builtin.get_url:
+    url: https://get.helm.sh/helm-v3.15.4-linux-amd64.tar.gz
+    dest: /tmp/helm-v3.15.4-linux-amd64.tar.gz
+    mode: '0644'
+
+- name: Extract Helm tarball
+  ansible.builtin.unarchive:
+    src: /tmp/helm-v3.15.4-linux-amd64.tar.gz
+    dest: /tmp/
+    remote_src: true
+
+- name: Set permissions for extracted files
+  ansible.builtin.file:
+    path: /tmp/linux-amd64/helm
+    mode: '0755'
+    state: file
+
+- name: Move Helm binary to /usr/local/bin
+  ansible.builtin.file:
+    src: /tmp/linux-amd64/helm
+    dest: /usr/local/bin/helm
+    state: link
