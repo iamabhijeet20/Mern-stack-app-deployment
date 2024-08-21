@@ -1,0 +1,21 @@
+---
+- name: Download eksctl tarball 
+  ansible.builtin.get_url:
+    url: "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_{{ ansible_facts.system_os }}_amd64.tar.gz"
+    dest: /tmp/eksctl.tar.gz
+
+- name: Extract eksctl tarball
+  ansible.builtin.unarchive:
+    src: /tmp/eksctl.tar.gz
+    dest: /tmp/
+    remote_src: true
+
+- name: Set permissions for eksctl binary
+  ansible.builtin.file:
+    path: /tmp/eksctl
+    mode: '0755'
+
+- name: Move eksctl to /usr/local/bin
+  ansible.builtin.command:
+    cmd: mv /tmp/eksctl /usr/local/bin/eksctl
+    creates: /usr/local/bin/eksctl
