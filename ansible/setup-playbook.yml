@@ -7,3 +7,4 @@
   - docker
   - kubectl
   - eksctl
+  - terraform
