@@ -1,0 +1,52 @@
+---
+- name: Install CA Certificates and Curl
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+    update_cache: true
+
+- name: Ensure /etc/apt/keyrings Exists with Correct Permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Docker GPG Key
+  ansible.builtin.uri:
+    url: 'https://download.docker.com/linux/ubuntu/gpg'
+    method: GET
+    dest: /etc/apt/keyrings/docker.asc
+    follow_redirects: safe
+  register: result
+
+- name: Set Permissions for /etc/apt/keyrings/docker.asc
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/docker.asc
+    mode: '0444'
+
+- name: Add Docker GPG key
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  ansible.builtin.apt_repository:
+    repo: >
+      deb [arch={{ ansible_architecture }}
+          signed-by=/etc/apt/trusted.gpg.d/docker.gpg]
+          https://download.docker.com/linux/ubuntu
+          {{ ansible_lsb.codename }} stable
+    filename: docker
+    state: present
+
+
+- name: Install Docker Packages
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    update_cache: true
