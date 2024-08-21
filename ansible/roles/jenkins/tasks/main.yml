@@ -1,0 +1,33 @@
+---
+- name: Update Packages
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install Java
+  ansible.builtin.apt:
+    name: openjdk-17-jre
+    state: present
+
+- name: Install Jenkins APT Key
+  ansible.builtin.apt_key:
+    url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+    state: present
+
+- name: Install Jenkins Repo
+  ansible.builtin.apt_repository:
+    repo: deb https://pkg.jenkins.io/debian-stable binary/
+    state: present
+
+- name: Update Repos
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install Jenkins
+  ansible.builtin.apt:
+    name: jenkins
+    state: present
+
+- name: Start Jenkins
+  ansible.builtin.service:
+    name: jenkins
+    state: started
