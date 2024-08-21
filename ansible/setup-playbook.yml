@@ -1,0 +1,5 @@
+- name: Installing packages with ansible
+  hosts: localhost
+  become: true
+  roles:
+  - awscli
