@@ -8,3 +8,4 @@
   - kubectl
   - eksctl
   - terraform
+  - helm
