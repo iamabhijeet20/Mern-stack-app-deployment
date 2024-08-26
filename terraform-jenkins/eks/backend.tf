@@ -1,12 +1,12 @@
-terraform {
-  cloud {
-    organization = "hello223"
+# terraform {
+#   cloud {
+#     organization = "hello223"
 
-    workspaces {
-      name = "test-workspace"
-    }
-  }
-}
+#     workspaces {
+#       name = "test-workspace"
+#     }
+#   }
+# }
 
 terraform {
   required_providers {
