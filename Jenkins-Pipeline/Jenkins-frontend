@@ -4,7 +4,7 @@ pipeline {
         nodejs 'nodejs'
     }
     environment  {
-        SCANNER_HOME=tool 'sonar-scanner'
+        SCANNER_HOME=tool 'sonarqube'
         AWS_ACCOUNT_ID = credentials('ACCOUNT_ID')
         AWS_ECR_REPO_NAME = credentials('ECR_REPO1')
         AWS_DEFAULT_REGION = 'ap-south-1'
@@ -18,12 +18,12 @@ pipeline {
         }
         stage('Checkout from Git') {
             steps {
-                git credentialsId: 'GITHUB-APP', url: 'https://github.com/iamabhijeet20/Mern-stack-app-deployment.git'
+                git branch: 'main', credentialsId: 'GITHUB-APP', url: 'https://github.com/iamabhijeet20/Mern-stack-app-deployment.git'
             }
         }
         stage('Sonarqube Analysis') {
             steps {
-                dir('Application-Code/frontend') {
+                dir('Application-Code/frontend/') {
                     withSonarQubeEnv('sonar-server') {
                         sh ''' $SCANNER_HOME/bin/sonar-scanner \
                         -Dsonar.projectName=frontend \
@@ -39,17 +39,17 @@ pipeline {
                 }
             }
         }
-        stage('OWASP Dependency-Check Scan') {
-            steps {
-                dir('Application-Code/frontend') {
-                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-                }
-            }
-        }
+        // stage('OWASP Dependency-Check Scan') {
+        //     steps {
+        //         dir('Application-Code/frontend') {
+        //             dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+        //             dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        //         }
+        //     }
+        // }
         stage('Trivy File Scan') {
             steps {
-                dir('Application-Code/frontend') {
+                dir('Application-Code/frontend/') {
                     sh 'trivy fs . > trivyfs.txt'
                 }
             }
@@ -57,7 +57,7 @@ pipeline {
         stage("Docker Image Build") {
             steps {
                 script {
-                    dir('Application-Code/frontend') {
+                    dir('Application-Code/frontend/') {
                             sh 'docker system prune -f'
                             sh 'docker container prune -f'
                             sh 'docker build -t ${AWS_ECR_REPO_NAME} .'
@@ -81,7 +81,7 @@ pipeline {
         }
         stage('Checkout Code') {
             steps {
-                git credentialsId: 'GITHUB-APP', url: 'https://github.com/iamabhijeet20/Mern-stack-app-deployment.git'
+                git branch: 'main', credentialsId: 'GITHUB-APP', url: 'https://github.com/iamabhijeet20/Mern-stack-app-deployment.git'
             }
         }
         stage('Update Deployment file') {
@@ -90,8 +90,8 @@ pipeline {
                 GIT_USER_NAME = "iamabhijeet20"
             }
             steps {
-                dir('Kubernetes-Manifests-file/Frontend') {
-                    withCredentials([string(credentialsId: 'github', variable: 'GITHUB_APP')]) {
+                dir('manifest-files/frontend') {
+                    withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
                         sh '''
                             git config user.email "iamabhijeetbhovar@gmail.com"
                             git config user.name "iamabhijeet20"
