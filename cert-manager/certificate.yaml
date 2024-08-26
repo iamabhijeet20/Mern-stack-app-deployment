@@ -1,0 +1,10 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: mern-stack-cert
+spec:
+  secretName: mern-stack-tls
+  dnsNames:
+  - abhijeetbhovar.com
+  issuerRef:
+    name: letsencrypt-issuer
