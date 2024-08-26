@@ -7,8 +7,10 @@ properties([
         choice(
             choices: ['plan', 'apply', 'destroy'], 
             name: 'Terraform_Action'
-        )])
+        )
+    ])
 ])
+
 pipeline {
     agent any
     stages {
@@ -24,44 +26,46 @@ pipeline {
         }
         stage('Init') {
             steps {
-                withCredentials([string(credentialsId: 'TERRAFORM_TOKEN', variable: 'TERRAFORM_TOKEN')])
-                withAWS(credentials: 'aws-creds', region: 'ap-south-1') {
-                sh '''
-                export TF_TOKEN_app_terraform_io=$TERRAFORM_TOKEN
-                terraform -chdir=terraform-jenkins/eks/ init
-                '''
+                withCredentials([string(credentialsId: 'TERRAFORM_TOKEN', variable: 'TERRAFORM_TOKEN')]) {
+                    withAWS(credentials: 'aws-creds', region: 'ap-south-1') {
+                        sh '''
+                        export TF_TOKEN_app_terraform_io=$TERRAFORM_TOKEN
+                        terraform -chdir=terraform-jenkins/eks/ init -upgrade
+                        '''
+                    }
                 }
             }
         }
         stage('Validate') {
             steps {
                 withAWS(credentials: 'aws-creds', region: 'ap-south-1') {
-                sh 'terraform -chdir=terraform-jenkins/eks/ validate'
+                    sh 'terraform -chdir=terraform-jenkins/eks/ validate'
                 }
             }
         }
         stage('Action') {
             steps {
-                withCredentials([string(credentialsId: 'TERRAFORM_TOKEN', variable: 'TERRAFORM_TOKEN')])
-                withAWS(credentials: 'aws-creds', region: 'ap-south-1') {
-                    script {    
-                        if (params.Terraform_Action == 'plan') {
-                            sh '''
-                            export TF_TOKEN_app_terraform_io=$TERRAFORM_TOKEN
-                            terraform -chdir=terraform-jenkins/eks/ plan -var-file=${params.Environment}.tfvars
-                            '''
-                        }   else if (params.Terraform_Action == 'apply') {
-                            sh '''
-                            export TF_TOKEN_app_terraform_io=$TERRAFORM_TOKEN
-                            terraform -chdir=terraform-jenkins/eks/ apply -var-file=${params.Environment}.tfvars -auto-approve
-                            '''
-                        }   else if (params.Terraform_Action == 'destroy') {
-                            sh '''
-                            export TF_TOKEN_app_terraform_io=$TERRAFORM_TOKEN
-                            terraform -chdir=terraform-jenkins/eks/ destroy -var-file=${params.Environment}.tfvars -auto-approve
-                            '''
-                        } else {
-                            error "Invalid value for Terraform_Action: ${params.Terraform_Action}"
+                withCredentials([string(credentialsId: 'TERRAFORM_TOKEN', variable: 'TERRAFORM_TOKEN')]) {
+                    withAWS(credentials: 'aws-creds', region: 'ap-south-1') {
+                        script {    
+                            if (params.Terraform_Action == 'plan') {
+                                sh '''
+                                export TF_TOKEN_app_terraform_io=$TERRAFORM_TOKEN
+                                terraform -chdir=terraform-jenkins/eks/ plan -var-file=${params.Environment}.tfvars
+                                '''
+                            } else if (params.Terraform_Action == 'apply') {
+                                sh '''
+                                export TF_TOKEN_app_terraform_io=$TERRAFORM_TOKEN
+                                terraform -chdir=terraform-jenkins/eks/ apply -var-file=${params.Environment}.tfvars -auto-approve
+                                '''
+                            } else if (params.Terraform_Action == 'destroy') {
+                                sh '''
+                                export TF_TOKEN_app_terraform_io=$TERRAFORM_TOKEN
+                                terraform -chdir=terraform-jenkins/eks/ destroy -var-file=${params.Environment}.tfvars -auto-approve
+                                '''
+                            } else {
+                                error "Invalid value for Terraform_Action: ${params.Terraform_Action}"
+                            }
                         }
                     }
                 }
