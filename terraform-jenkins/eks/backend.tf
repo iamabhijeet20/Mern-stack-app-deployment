@@ -1,22 +1,20 @@
 terraform {
-  cloud {
-    organization = "hello223"
-
-    workspaces {
-      name = "test-workspace"
-    }
-  }
-}
-
-terraform {
+  required_version = "~> 1.9.3"
   required_providers {
     aws = {
-      source = "hashicorp/aws"
-      version = "5.55.0"
+      source  = "hashicorp/aws"
+      version = "~> 5.49.0"
     }
+  }
+  backend "s3" {
+    bucket         = "abhijeet-aws-state"
+    region         = "ap-south-1"
+    key            = "terraform-jenkins/eks/terraform.tfstate"
+    dynamodb_table = "Lock-Files"
+    encrypt        = true
   }
 }
 
 provider "aws" {
-  region  = ap-south-1
+  region  = var.aws-region
 }
