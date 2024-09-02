@@ -12,3 +12,6 @@ mongodb:
     name: mongodb
     version: 4.4.6
   containerPort: 27017
+  pvc:
+    name: mongo-volume-claim
+    storage: 1Gi
