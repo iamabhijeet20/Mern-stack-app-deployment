@@ -41,7 +41,7 @@ spec:
                 key: password
         volumeMounts:
           - name: mongo-volume
-            mountPath: /data/db
+            mountPath: {{ .Values.mongodb.pv.storagepath }}
       volumes: 
       - name: mongo-volume
         persistentVolumeClaim:
