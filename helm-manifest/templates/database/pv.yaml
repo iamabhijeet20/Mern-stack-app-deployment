@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.mongodb.name }}-pv
+  namespace: {{ .Values.common.namespace }}
+spec:
+  capacity: 
+    storage: {{ .Values.mongodb.pv.storage }}
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: {{ .Values.mongodb.pv.storagepath }}
