@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Values.common.namespace }}
+  name: {{ .Values.mongodb.name }}-svc
+  annotations:
+    "helm.sh/hook": pre-install
+spec:
+  selector:
+    app: {{ .Values.mongodb.name }}
+  ports:
+  - name: {{ .Values.mongodb.name }}-svc
+    protocol: TCP
+    port: {{ .Values.mongodb.containerPort }}
+    targetPort: {{ .Values.mongodb.containerPort }}
