@@ -94,7 +94,7 @@ pipeline {
                     withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
                         sh '''
                             git config user.email "iamabhijeetbhovar@gmail.com"
-                            git config user.name "AmanPathak-DevOps"
+                            git config user.name "iamabhijeet20"
                             BUILD_NUMBER=${BUILD_NUMBER}
                             echo $BUILD_NUMBER
                             imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
